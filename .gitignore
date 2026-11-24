@@ -1,0 +1,55 @@
+
+# Python / virtual environments
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbtmp
+
+# Secrets
+.env
+.env.*
+!.env.example
+secrets.*
+*.pem
+*.key
+
+# Large model checkpoints
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.onnx
+models/**
+
+# Dataset files
+data/*.csv
+data/*.xlsx
+data/*.zip
+llm_experiments/data/raw/
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/*
+
+# Experiment caches
+.cache/
+huggingface/

@@ -1,0 +1,4 @@
+Model,Accuracy,Precision,Recall,F1,ROC_AUC,Epsilon
+Logistic Regression,0.8691,0.7728,0.5684,0.655,0.868,
+Standard MLP,0.9212,0.953,0.6728,0.7888,0.9165,
+DP-MLP,0.8775,0.8164,0.5677,0.6697,0.8844,1.3304
