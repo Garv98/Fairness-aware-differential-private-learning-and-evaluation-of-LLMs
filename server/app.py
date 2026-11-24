@@ -50,7 +50,12 @@ async def lifespan(_app):
     yield
 
 app = FastAPI(title="FairDP demo API", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=core.CFG["cors_origins"], allow_methods=["GET", "POST"], allow_headers=["*"])
+# Allowed dashboard origins: config.yaml, plus deployment overrides via env vars
+#   CORS_ORIGINS="https://my-app.vercel.app,https://other.example"   (exact origins)
+#   CORS_ORIGIN_REGEX="https://my-app(-[a-z0-9-]+)?\.vercel\.app"   (e.g. Vercel preview URLs)
+_origins = core.CFG["cors_origins"] + [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
+app.add_middleware(CORSMiddleware, allow_origins=_origins, allow_origin_regex=os.environ.get("CORS_ORIGIN_REGEX") or None,
+                   allow_methods=["GET", "POST"], allow_headers=["*"])
 
 
 def need(name: str):

@@ -39,7 +39,7 @@ export default function Overview({ eps }: { eps: number }) {
         <Kpi k="Membership-attack AUC (0.5 = coin flip)" v={f3(oursId ? at(oursId)?.mia.mia_auc : null)} d={`${oursId ? short(oursId) : ""} at ε = ${eps}`} />
       </div>
 
-      <Card title="System pipeline" hint="Every number below is read from the running backend.">
+      <Card title="System pipeline" hint="Every number below is computed from the trained models, not typed in.">
         <div className="pipe">
           {pipe.map(([h, b], i) => (
             <div key={h} className={`pipe-step ${i === 2 || i === 3 ? "hl" : ""}`}>

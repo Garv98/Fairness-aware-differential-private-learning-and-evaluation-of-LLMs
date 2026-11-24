@@ -2,15 +2,23 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const API = process.env.NEXT_PUBLIC_API ?? "http://127.0.0.1:8000";
+/** "server": the FastAPI backend (full features, run_demo.bat).
+ *  "browser": the same models run in the visitor's browser (static deployment, e.g. Vercel). */
+export const MODE: "server" | "browser" = process.env.NEXT_PUBLIC_MODE === "browser" ? "browser" : "server";
 
 async function handle<T>(r: Response): Promise<T> {
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail ?? `HTTP ${r.status}`);
   const ct = r.headers.get("content-type") ?? "";
   return (ct.includes("application/json") ? r.json() : r.text()) as Promise<T>;
 }
-export const get = <T,>(path: string) => fetch(`${API}${path}`).then((r) => handle<T>(r));
-export const post = <T,>(path: string, body: unknown) =>
-  fetch(`${API}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => handle<T>(r));
+const local = () => import("./engine/router");
+const errMsg = (e: unknown) => { throw new Error((e as Error)?.message ?? String(e)); };
+export const get = <T,>(path: string): Promise<T> => MODE === "browser"
+  ? local().then((m) => m.localGet(path) as Promise<T>).catch(errMsg)
+  : fetch(`${API}${path}`).then((r) => handle<T>(r));
+export const post = <T,>(path: string, body: unknown): Promise<T> => MODE === "browser"
+  ? local().then((m) => m.localPost(path, body as Record<string, unknown>) as Promise<T>).catch(errMsg)
+  : fetch(`${API}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => handle<T>(r));
 
 // Response cache shared by all components. Entries are keyed by request path;
 // `invalidate()` drops everything (used when the backend comes back online).

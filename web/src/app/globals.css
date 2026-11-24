@@ -27,6 +27,9 @@
   --bad: #c2410c; --bad-bg: #fcece3;
   --warn: #a16207; --warn-bg: #fbf4de;
   --seq-0: #f1f6fd; --seq-1: #cde2fb; --seq-2: #9ec5f4; --seq-3: #5598e7; --seq-4: #256abf; --seq-5: #104281;
+  --f-display: "Bricolage Grotesque Variable";
+  --f-sans: "IBM Plex Sans";
+  --f-mono: "IBM Plex Mono";
   --font-display: var(--f-display), "Segoe UI", system-ui, sans-serif;
   --font-sans: var(--f-sans), "Segoe UI", system-ui, sans-serif;
   --font-mono: var(--f-mono), ui-monospace, Consolas, monospace;

@@ -1,6 +1,6 @@
 "use client";
 import type { ReactNode } from "react";
-import { API } from "@/lib/api";
+import { API, MODE } from "@/lib/api";
 import { color } from "@/lib/models";
 
 export function Seg<T extends string | number>({ value, options, onChange, label }: { value: T; options: { v: T; l: ReactNode }[]; onChange: (v: T) => void; label: string }) {
@@ -34,6 +34,7 @@ export function Pass({ v }: { v: boolean | null | undefined }) {
 }
 
 export function ApiError({ error }: { error: string }) {
+  if (MODE === "browser") return <div className="err"><b>Couldn&apos;t load this view</b> ({error}). Reload the page; if it persists, the model files failed to download.</div>;
   return (
     <div className="err">
       <b>Can&apos;t reach the FairDP backend</b> ({error}). Start it with:

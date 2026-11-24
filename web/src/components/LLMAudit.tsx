@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Evaluation, key, post, useApi, useMeta } from "@/lib/api";
+import { Evaluation, MODE, key, post, useApi, useMeta } from "@/lib/api";
 import { pct } from "@/lib/models";
 import { ApiError, Card, Loading, ModelName, Seg, fmtPct } from "./ui";
 
@@ -52,7 +52,7 @@ export default function LLMAudit() {
         <Card title="Prompt sent to the LLM" hint="Built by the same serializer the experiments use, from a real test-set person. Only sex and race change during the audit."
           right={<select aria-label="applicant" value={i} onChange={(e) => { setI(Number(e.target.value)); setOut(null); }} style={{ padding: "5px 8px", border: "1px solid var(--rule)", borderRadius: 8 }}>{meta.samples.map((s, k) => <option key={k} value={k}>#{k + 1} · {s.label}</option>)}</select>}>
           <pre className="mono prompt">{prompt ? `system: ${prompt.system}\n\nuser: ${prompt.user}` : "…"}</pre>
-          <p className="note">True answer for this person: {truth ? "> $50k" : "≤ $50k"}. Responses are cached on disk, so repeated demos cost no API quota.</p>
+          <p className="note">True answer for this person: {truth ? "> $50k" : "≤ $50k"}. {MODE === "browser" ? "Each audit sends 10 live requests to the provider." : "Responses are cached on disk, so repeated demos cost no API quota."}</p>
         </Card>
         <Card title="Run the counterfactual audit" hint={`Ask the LLM the same question for every sex × race identity (${meta.schema.categorical.sex.length * meta.schema.categorical.race.length} prompts) and compare answers.`}>
           <div className="grid" style={{ gap: 12 }}>
@@ -63,7 +63,9 @@ export default function LLMAudit() {
               {!info ? <select id="mdl" disabled><option>loading models…</option></select> : available.length ? <select id="mdl" value={model} onChange={(e) => setModel(e.target.value)}>{available.map((m) => <option key={m} value={m}>{m}</option>)}</select>
                 : <input id="mdl" value={model} onChange={(e) => setModel(e.target.value)} placeholder="model id" style={{ padding: "7px 9px", border: "1px solid var(--rule)", borderRadius: 8 }} />}</div>
             <div><button className="btn primary" type="button" onClick={run} disabled={busy || !hasKey || !model}>{busy ? "Querying…" : "Run audit"}</button></div>
-            {!hasKey && <div className="callout warn">No API key for <b>{P}</b>. Set it in the terminal before starting the API (for example <code>set GROQ_API_KEY=…</code>), then restart the API.</div>}
+            {!hasKey && (MODE === "browser"
+              ? <div className="callout warn">No API key for <b>{P}</b> is configured on this deployment. Add <code>GROQ_API_KEY</code> to the hosting environment variables and redeploy.</div>
+              : <div className="callout warn">No API key for <b>{P}</b>. Set it in the terminal before starting the API (for example <code>set GROQ_API_KEY=…</code>), then restart the API.</div>)}
             {err && <div className="callout bad">{err}</div>}
           </div>
         </Card>

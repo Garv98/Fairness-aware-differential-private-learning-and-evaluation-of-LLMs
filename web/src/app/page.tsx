@@ -14,7 +14,7 @@ import TrainLive from "@/components/TrainLive";
 import LLMAudit from "@/components/LLMAudit";
 import CreditStudy from "@/components/CreditStudy";
 import { ApiError, EpsPicker } from "@/components/ui";
-import { API, get, invalidate, useMeta } from "@/lib/api";
+import { API, MODE, get, invalidate, useMeta } from "@/lib/api";
 
 interface Tab { id: string; label: string; icon: LucideIcon; title: string; sub: string; eps: boolean; section: string }
 const TABS: Tab[] = [
@@ -26,7 +26,7 @@ const TABS: Tab[] = [
   { id: "proxy", section: "Responsible AI", label: "Proxy audit", icon: ScanSearch, title: "Proxy audit", sub: "Does hiding sex and race make a model fair?", eps: false },
   { id: "scorecard", section: "Responsible AI", label: "Scorecard", icon: BadgeCheck, title: "Responsible-AI scorecard", sub: "Privacy, fairness, transparency, accountability and robustness checks per model", eps: true },
   { id: "cards", section: "Responsible AI", label: "Model cards", icon: FileText, title: "Model cards & provenance", sub: "Documentation and audit trail generated from the artifacts", eps: true },
-  { id: "train", section: "Experiments", label: "Train live", icon: Activity, title: "Train live", sub: "Train a model on the backend and watch it learn", eps: false },
+  { id: "train", section: "Experiments", label: "Train live", icon: Activity, title: "Train live", sub: "Train a private model and watch it learn", eps: false },
   { id: "llm", section: "Experiments", label: "LLM audit", icon: Bot, title: "LLM audit", sub: "Do modern LLMs change their answer when only race or sex changes?", eps: false },
   { id: "credit", section: "Experiments", label: "Credit study", icon: Landmark, title: "Credit-risk study", sub: "First workstream: DP-SGD on loan-default data", eps: false },
 ];
@@ -103,8 +103,8 @@ export default function Page() {
           ))}
         </nav>
         <div className="foot">
-          <span><span className="dot" style={{ background: health === "ok" ? "#34d399" : health === "down" ? "#f87171" : "#a3a3a3" }} />Backend {health === "ok" ? "online" : health === "down" ? "offline" : "…"}</span>
-          <span className="mono" style={{ fontSize: 10.5 }}>{API}</span>
+          <span><span className="dot" style={{ background: health === "ok" ? "#34d399" : health === "down" ? "#f87171" : "#a3a3a3" }} />{MODE === "browser" ? "Models running in your browser" : <>Backend {health === "ok" ? "online" : health === "down" ? "offline" : "…"}</>}</span>
+          <span className="mono" style={{ fontSize: 10.5 }}>{MODE === "browser" ? "same trained weights · no server" : API}</span>
           {meta && <span>{meta.info.dataset} · {meta.models.length} models · seed {meta.info.seed}</span>}
         </div>
       </aside>
@@ -122,7 +122,7 @@ export default function Page() {
         <main className="content">
           {metaError ? (
             <div className="grid"><ApiError error={metaError} /><div><button className="btn primary" type="button" onClick={reload}>Retry</button></div></div>
-          ) : E == null ? <p className="muted">Connecting to the backend…</p> : (
+          ) : E == null ? <p className="muted">{MODE === "browser" ? "Loading the trained models…" : "Connecting to the backend…"}</p> : (
             // visited tabs stay mounted (hidden) so their state survives tab switches
             visited.map((id) => <div key={id} className={`grid tab-panel ${id === tab ? "" : "offstage"}`} aria-hidden={id !== tab} inert={id !== tab}>{render(id)}</div>)
           )}

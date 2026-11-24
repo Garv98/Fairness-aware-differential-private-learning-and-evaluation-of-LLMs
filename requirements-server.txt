@@ -1,0 +1,11 @@
+# Runtime dependencies of the demo backend (server/). torch is installed
+# separately from the CPU wheel index in the Dockerfile.
+numpy>=1.26,<2.1
+pandas>=2.2
+scipy>=1.13
+scikit-learn>=1.5
+opacus>=1.5
+pyyaml>=6
+pyarrow>=15
+fastapi>=0.110
+uvicorn[standard]>=0.29

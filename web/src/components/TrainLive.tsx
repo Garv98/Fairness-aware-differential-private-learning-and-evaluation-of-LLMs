@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { get, post, useMeta } from "@/lib/api";
+import { MODE, get, post, useMeta } from "@/lib/api";
 import { color, f3, pct } from "@/lib/models";
 import { ApiError, Card, Kpi, Loading, ModelName, Pass, Seg } from "./ui";
 
 interface Ep { epoch: number; accuracy: number; balanced_accuracy: number; recall: number; intersection_worst_tpr: number; eps_spent?: number; loss?: number }
 interface Job { id: string; status: "running" | "done" | "error"; method: string; name: string; private: boolean; eps: number | null; epochs_total: number; epochs: Ep[];
-  noise?: Record<string, number>; final?: Record<string, number>; final_ethics?: Record<string, { disparate_impact_ratio: number | null; four_fifths_pass: boolean | null; equal_opportunity_diff: number | null }>; error?: string }
+  noise?: Record<string, number>; final?: Record<string, number>; final_ethics?: Record<string, { disparate_impact_ratio: number | null; four_fifths_pass: boolean | null; equal_opportunity_diff: number | null }>; error?: string; lite?: string }
 
 export default function TrainLive() {
   const { meta, error, order, short, isPrivate, oursId } = useMeta();
@@ -60,7 +60,9 @@ export default function TrainLive() {
 
   return (
     <div className="grid">
-      <Card title="Train a model now" hint={`Runs the real training code on the backend (${meta.info.train_size.toLocaleString()} people, PyTorch). Each epoch the model is evaluated on the test set.`}>
+      <Card title="Train a model now" hint={MODE === "browser"
+        ? "Runs the same training algorithms (DP-SGD with per-person clipping, Gaussian noise and the Rényi-DP accountant) inside your browser, on a subset of the training data with a smaller network, so it finishes in seconds. Each epoch the model is evaluated on held-out test people. The served models are not changed."
+        : `Runs the real training code on the backend (${meta.info.train_size.toLocaleString()} people, PyTorch). Each epoch the model is evaluated on the test set.`}>
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap", alignItems: "end" }}>
           <div className="field" role="group" aria-label="Method"><span className="lbl">Method</span><Seg label="method" value={M} onChange={setMethod} options={order.map((m) => ({ v: m, l: short(m) }))} /></div>
           <div className="field" style={{ opacity: isPrivate(M) ? 1 : 0.4 }}><span className="lbl">Privacy budget</span><Seg label="epsilon" value={E} onChange={setEps} options={meta.train_epsilons.map((e) => ({ v: e, l: `ε = ${e}` }))} /></div>
@@ -71,6 +73,7 @@ export default function TrainLive() {
         {err && <p className="note" style={{ color: "var(--bad)" }}>{err}</p>}
       </Card>
 
+      {job?.lite && <p className="note" style={{ margin: 0 }}>{job.lite}</p>}
       {job && (
         <div className="grid g4">
           <Kpi k="Status" v={<span style={{ fontSize: 22 }}>{job.status === "running" ? `Epoch ${job.epochs.length} / ${job.epochs_total}` : job.status === "done" ? "Finished" : "Error"}</span>} d={<ModelName id={job.method} name={job.name} />} />

@@ -40,6 +40,30 @@ This README explains every part so that any team member can run, present or exte
 
 ## 1. Five-minute quick start
 
+### Online, nothing to install
+**https://fairdp-audit.vercel.app** runs the same 11 trained models **inside the visitor's browser**:
+- **Weights:** a read-only copy of the served weights, also published at [huggingface.co/Garv98/fairdp-models](https://huggingface.co/Garv98/fairdp-models).
+- **Results:** published at [huggingface.co/datasets/Garv98/fairdp-results](https://huggingface.co/datasets/Garv98/fairdp-results).
+
+What runs where:
+
+| Feature | Online (browser mode) | Local (`run_demo.bat`, full backend) |
+|---|---|---|
+| Decisions, explanations, recourse, counterfactual grid | Real models in the browser, identical to PyTorch (see below) | PyTorch |
+| Fairness, privacy accountant, mitigation, threshold sweep | Recomputed in the browser from the exported scores | Python |
+| Train live | "Lite": same algorithms on 8,000 training people, MLP 32→16, a few seconds | Full training set, PyTorch |
+| LLM audit | Vercel serverless function; the Groq key stays server-side | Python, with an on-disk response cache |
+
+**Parity is tested, not assumed.** `cd web && npx tsx scripts/parity.ts` compares the browser engine with PyTorch and the Python API:
+- all 11 models × 9,758 test people: largest difference 8 × 10⁻⁷, **0 decisions changed**
+- the accountant matches Opacus exactly
+- mitigation, sweep and evaluation metrics are identical
+
+**Updating the deployment** after retraining:
+1. Run `python server/export_static.py`. It writes `web/public/static/` and only reads the models.
+2. Run the parity test.
+3. Redeploy `web/` on Vercel, with project root `web` and the environment variables `NEXT_PUBLIC_MODE=browser` and `GROQ_API_KEY`, the latter marked sensitive.
+
 **Requirements:** Python 3.12, Node.js 20+ (22 tested), about 2 GB of free disk space and an internet connection on the first run. The first run downloads UCI Adult from OpenML.
 
 ### Windows, one click
@@ -461,7 +485,9 @@ Roughly 10 minutes; adapt as needed.
 ## 11. Testing & quality
 
 ```bash
-pytest -q          # 39 tests, ~45 s
+pytest -q                          # 39 tests, ~45 s
+cd web && npx tsx scripts/parity.ts       # browser engine == PyTorch / Opacus / Python API
+cd web && npx tsx scripts/train-smoke.ts  # in-browser training: every method trains, spends exactly the target epsilon
 ```
 
 | Test file | Covers |
