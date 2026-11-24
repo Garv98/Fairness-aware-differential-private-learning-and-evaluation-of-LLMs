@@ -1,0 +1,11 @@
+# Component 4: how much of the fixed budget should go to group statistics?
+name: budget_split
+datasets:
+  - name: credit
+  - name: adult
+seeds: [0, 1, 2, 3, 4]
+epsilons: [1.0, 3.0, 8.0]
+methods: [erm, dpsgd, "ig_dpsgd@aux0.02", "ig_dpsgd@aux0.05", "ig_dpsgd@aux0.1", "ig_dpsgd@aux0.2"]
+hidden: [64, 32]
+nonprivate: {epochs: 20, batch_size: 64, lr: 0.001}
+dp: {epochs: 20, expected_batch_size: 256, lr: 0.002, max_grad_norm: 1.0}

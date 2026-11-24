@@ -53,3 +53,25 @@ desktop.ini
 # Experiment caches
 .cache/
 huggingface/
+
+# LLM response cache (may contain prompts with dataset rows)
+llm_experiments/cache/
+results/runs/smoke/
+results/*.log
+
+# Downloaded datasets (re-downloaded automatically; not redistributed)
+data/acs/
+data/openml/
+
+# Generated demo artifacts (rebuild: python server/train_models.py)
+server/artifacts/
+
+# Experiment scratch: keep only the combined pilot_v2 results
+results/runs/*/raw/
+results/runs/pilot/
+results/runs/smoke/
+
+# Tooling / build caches
+.pytest_cache/
+*.tsbuildinfo
+.playwright-mcp/

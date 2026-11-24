@@ -1,11 +1,22 @@
-numpy
-pandas
-matplotlib
-seaborn
-scikit-learn
-imbalanced-learn
+# core
+numpy>=1.26,<2.1
+pandas>=2.2
+scipy>=1.13
+scikit-learn>=1.5
+torch>=2.3
+opacus>=1.5
+pyyaml>=6
+pyarrow>=15
+matplotlib>=3.8
+# fairness / data
+fairlearn>=0.11
+folktables>=0.0.12
+# demo backend
+fastapi>=0.110
+uvicorn[standard]>=0.29
+httpx>=0.27
+# dev
+pytest>=8
 jupyter
 ipykernel
-pyyaml
-opacus
-torch
+# LLM study (Colab GPU): transformers accelerate bitsandbytes  (install separately)

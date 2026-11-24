@@ -1,0 +1,12 @@
+# Pilot for method development on Adult (= the designated tuning dataset).
+# Not for reporting on Adult; choices made here are frozen for credit/ACS.
+name: pilot_v2
+datasets:
+  - name: adult
+seeds: [0, 1, 2, 3, 4]
+epsilons: [1.0, 3.0, 8.0]
+methods: [erm, class_weighted, groupdro, dpsgd, dpsgd_balanced, dpsgd_f, global_adapt,
+          ig_dpsgd, ig_no_smoothing, ig_global_adapt, ig_single_attr]
+hidden: [64, 32]
+nonprivate: {epochs: 10, batch_size: 64, lr: 0.001}
+dp: {epochs: 10, expected_batch_size: 256, lr: 0.002, max_grad_norm: 1.0}

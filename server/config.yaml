@@ -1,0 +1,53 @@
+# FairDP demo configuration: single source of truth for the backend and,
+# through /api/meta, for every number and option the dashboard shows.
+dataset: adult            # loader name in fairdp.data.loaders
+seed: 0
+split: {test_size: 0.2, val_size: 0.1}
+model: {hidden: [64, 32]}
+epochs: 10
+decision_threshold: 0.5
+task: {label: "income > $50k", positive: "> $50k", negative: "≤ $50k", dataset_title: "UCI Adult"}
+cors_origins: ["http://127.0.0.1:3000", "http://localhost:3000"]
+threshold_grid: {min: 0.1, max: 0.9, step: 0.05}      # mitigation slider + sweep
+accountant: {sigma: {min: 0.4, max: 5, step: 0.05, default: 1.0}, batch: {min: 32, max: 2048, step: 32}, epochs: {min: 1, max: 50}}
+
+# privacy budgets of the served models, and the options offered for live training
+epsilons: [1, 3, 8]
+train_epsilons: [0.5, 1, 2, 3, 5, 8]
+train_epochs: {min: 2, max: 15, default: 8}
+dp: {expected_batch_size: 256, lr: 0.002, max_grad_norm: 1.0}
+nonprivate: {batch_size: 64, lr: 0.001}
+
+# served models; component settings come from experiments/run.py (single registry)
+methods:
+  - {id: erm, name: "Standard (no privacy)", short: "Standard"}
+  - {id: groupdro, name: "Group DRO (no privacy)", short: "Group DRO"}
+  - {id: dpsgd, name: "DP-SGD", short: "DP-SGD", baseline: true}
+  - {id: dpsgd_balanced, name: "DP-SGD + label balancing", short: "DP + balancing"}
+  - {id: ig_dpsgd, name: "IG-DPSGD (ours)", short: "IG-DPSGD (ours)", ours: true}
+
+study_run: pilot_v2       # multi-seed experiment run shown as robustness evidence
+
+demo:
+  n_samples: 8            # applicants selected automatically (largest model disagreement, one per group)
+
+# algorithmic recourse: features a person can realistically change, with cost per step
+recourse:
+  education: {cost_per_level: 1.0, max_levels: 4}
+  hours-per-week: {step: 5, cost_per_step: 0.5, max: 60}
+
+# responsible-AI scorecard thresholds (literature conventions, adjustable)
+scorecard:
+  four_fifths_ratio: 0.8        # EEOC four-fifths rule for disparate impact
+  equalized_odds_max: 0.10      # tolerated TPR/FPR gap between sex or race groups
+  calibration_gap_max: 0.05     # tolerated ECE difference between groups
+  consistency_min: 0.90         # individual fairness (kNN consistency)
+  mia_auc_max: 0.55             # membership attack AUC above this = measurable leakage
+  epsilon_max: 8                # largest epsilon still called "private" in this demo
+
+# sensitive attributes for the proxy audit: attribute -> value treated as positive class
+proxy_audit:
+  sex: Female
+  race: White
+# proxy-strength labels for the proxy audit (AUC of recovering the attribute)
+proxy_strength: {strong: 0.8, moderate: 0.65}

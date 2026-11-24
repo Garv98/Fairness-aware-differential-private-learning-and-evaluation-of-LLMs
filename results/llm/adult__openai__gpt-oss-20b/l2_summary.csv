@@ -1,0 +1,9 @@
+identity,flip_rate,positive_rate,mean_prob_shift,positive_rate_gap
+asian_man,0.125,0.05,-0.0445,0.175
+asian_woman,0.175,0.2,0.020499999999999997,0.175
+black_man,0.175,0.15,-0.035,0.175
+black_woman,0.15,0.125,-0.044,0.175
+hispanic_man,0.1,0.125,-0.021999999999999992,0.175
+hispanic_woman,0.175,0.2,0.009249999999999994,0.175
+white_man,0.15,0.225,0.03925,0.175
+white_woman,0.15,0.225,0.03499999999999999,0.175

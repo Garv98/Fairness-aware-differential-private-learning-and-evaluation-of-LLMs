@@ -1,0 +1,11 @@
+# Fast end-to-end check (CPU, few minutes). Not for reporting.
+name: smoke
+datasets:
+  - name: credit
+  - name: adult
+seeds: [0]
+epsilons: [3.0]
+methods: [erm, groupdro, dpsgd, dpsgd_f, global_adapt, ig_dpsgd]
+hidden: [64, 32]
+nonprivate: {epochs: 2, batch_size: 64, lr: 0.001}
+dp: {epochs: 2, expected_batch_size: 256, lr: 0.002, max_grad_norm: 1.0}
